@@ -141,50 +141,50 @@ while : ; do
   case $c in
     [0-9]) tmux send-keys "$(cat "${PLUGIN_DIR}/pastebufs/current/b${c}")"; exit ;;
     a)
-      while : ; do
+      show_menu
+      tmux_pastebuf_clipboard="$(tmux show-buffer 2>&1 | head -n1 | head -c"${TMUX_PASTEBUF_PREVIEW_CHARS}")"
+      echo -n "[a] add clip [${tmux_pastebuf_clipboard}...] to pastebuf (0-9): "
+      reply=$(bash -c "read -n 1 c; echo \$c")
+      if [[ "$reply" =~ [0-9] ]]; then
+        tmux show-buffer > "${PLUGIN_DIR}/pastebufs/current/b${reply}"
+        clear
         show_menu
-        tmux_pastebuf_clipboard="$(tmux show-buffer 2>&1 | head -n1 | head -c"${TMUX_PASTEBUF_PREVIEW_CHARS}")"
-        echo -n "[a] add clip [${tmux_pastebuf_clipboard}...] to pastebuf (0-9): "
-        reply=$(bash -c "read -n 1 c; echo \$c")
-        if [[ "$reply" =~ [0-9] ]]; then
-          tmux show-buffer > "${PLUGIN_DIR}/pastebufs/current/b${reply}"
-          clear
-          show_menu
-          break
-        fi
-      done ;;
+      else
+        show_menu; echo -n "Invalid pastebuf [$c]"
+      fi
+      ;;
     s)
-      while : ; do
+      show_menu
+      echo -n "[s] pastebuf (0-9): "
+      reply=$(bash -c "read -n 1 c; echo \$c")
+      if [[ "$reply" =~ [0-9] ]]; then
+        tmux send -X copy-pipe 'read inp; echo $inp > '"${PLUGIN_DIR}/pastebufs/current/b${reply}"''
+        clear
         show_menu
-        echo -n "[s] pastebuf (0-9): "
-        reply=$(bash -c "read -n 1 c; echo \$c")
-        if [[ "$reply" =~ [0-9] ]]; then
-          tmux send -X copy-pipe 'read inp; echo $inp > '"${PLUGIN_DIR}/pastebufs/current/b${reply}"''
-          clear
-          show_menu
-          break
-        fi
-      done ;;
+      else
+        show_menu; echo -n "Invalid pastebuf [$c]"
+      fi
+      ;;
     h)
-      while : ; do
-        show_menu
-        echo -n "[h] pastebuf (0-9): "
-        reply=$(bash -c "read -n 1 c; echo \$c")
-        if [[ "$reply" =~ [0-9] ]]; then
-          histcmd=$(get_tmux_option "@poltergeist_history_cmd")
-          if [ "$histcmd" == "" ]; then
-            histitem=$(default_histcmd)
-          else
-            histitem=$(eval "$histcmd")
-          fi
-
-          if [ -n "$histitem" ]; then
-            echo -n "$histitem" > "${PLUGIN_DIR}/pastebufs/current/b${reply}"
-          fi
-          show_menu
-          break
+      show_menu
+      echo -n "[h] pastebuf (0-9): "
+      reply=$(bash -c "read -n 1 c; echo \$c")
+      if [[ "$reply" =~ [0-9] ]]; then
+        histcmd=$(get_tmux_option "@poltergeist_history_cmd")
+        if [ "$histcmd" == "" ]; then
+          histitem=$(default_histcmd)
+        else
+          histitem=$(eval "$histcmd")
         fi
-      done ;;
+
+        if [ -n "$histitem" ]; then
+          echo -n "$histitem" > "${PLUGIN_DIR}/pastebufs/current/b${reply}"
+        fi
+        show_menu
+      else
+        show_menu; echo -n "Invalid pastebuf [$c]"
+      fi
+      ;;
     o)
       show_menu
       echo -n "[o] Copy pastebuf from> "
@@ -208,28 +208,28 @@ while : ; do
       fi
       ;;
     e|v)
-      while : ; do
+      show_menu
+      echo -n "[$c] pastebuf (0-9): "
+      reply=$(bash -c "read -n 1 c; echo \$c")
+      if [[ "$reply" =~ [0-9] ]]; then
+        editor=$(get_tmux_option "@poltergeist_editor" "vim")
+        $editor "${PLUGIN_DIR}/pastebufs/current/b${reply}"
         show_menu
-        echo -n "[$c] pastebuf (0-9): "
-        reply=$(bash -c "read -n 1 c; echo \$c")
-        if [[ "$reply" =~ [0-9] ]]; then
-          editor=$(get_tmux_option "@poltergeist_editor" "vim")
-          $editor "${PLUGIN_DIR}/pastebufs/current/b${reply}"
-          show_menu
-          break
-        fi
-      done ;;
+      else
+        show_menu; echo -n "Invalid pastebuf [$c]"
+      fi
+      ;;
     c)
-      while : ; do
+      show_menu
+      echo -n "[c] pastebuf (0-9): "
+      reply=$(bash -c "read -n 1 c; echo \$c")
+      if [[ "$reply" =~ [0-9] ]]; then
+        echo "" > "${PLUGIN_DIR}/pastebufs/current/b${reply}"
         show_menu
-        echo -n "[c] pastebuf (0-9): "
-        reply=$(bash -c "read -n 1 c; echo \$c")
-        if [[ "$reply" =~ [0-9] ]]; then
-          echo "" > "${PLUGIN_DIR}/pastebufs/current/b${reply}"
-          show_menu
-          break
-        fi
-      done ;;
+      else
+        show_menu; echo -n "Invalid pastebuf [$c]"
+      fi
+      ;;
     w)
       show_menu
       echo -n "[x] Swap pastebufs >"

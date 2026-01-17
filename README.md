@@ -17,6 +17,7 @@ The following commands can be used for managing paste buffers.
 |  a  | add from tmux paste buffer |
 |  s  | add from current tmux selection |
 |  h  | add from shell history |
+|  o  | add from other pastebuf |
 |  e  | edit pastebuf with text editor |
 |  c  | clear pastebuf |
 |  w  | swap pastebufs |

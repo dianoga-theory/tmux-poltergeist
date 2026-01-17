@@ -69,6 +69,7 @@ ${HEADLINE}ᗣ General Keybindings${NORMAL}
   ${BULLET}[a]${NORMAL}  add from clipboard
   ${BULLET}[s]${NORMAL}  add from selection
   ${BULLET}[h]${NORMAL}  add from history
+  ${BULLET}[o]${NORMAL}  add from other pastebuf
   ${BULLET}[e]${NORMAL}  edit pastebuf
   ${BULLET}[c]${NORMAL}  clear pastebuf
   ${BULLET}[w]${NORMAL}  swap pastebufs
@@ -184,6 +185,28 @@ while : ; do
           break
         fi
       done ;;
+    o)
+      show_menu
+      echo -n "[o] Copy pastebuf from> "
+      pb1=$(bash -c "read -n 1 c; echo \$c")
+      echo -n " to> "
+      if [[ $pb1 =~ [0-9] ]]; then
+        pb2=$(bash -c "read -n 1 c; echo \$c")
+        if [[ $pb2 =~ [0-9] ]]; then
+          show_menu
+          echo -ne "[o] Copy pastebuf "$pb1" to "$pb2"? [y/n] "
+          user_resp=$(bash -c "read -n 1 c; echo \$c")
+          if [ "$user_resp" == "y" ]; then
+            cp "${PLUGIN_DIR}/pastebufs/current/b${pb1}" "${PLUGIN_DIR}/pastebufs/current/b${pb2}"
+          fi
+          show_menu
+        else
+          show_menu; echo -n "Invalid pastebuf [$c]"
+        fi
+      else
+        show_menu; echo -n "Invalid pastebuf [$c]"
+      fi
+      ;;
     e|v)
       while : ; do
         show_menu
